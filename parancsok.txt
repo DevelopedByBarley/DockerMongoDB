@@ -1,0 +1,31 @@
+
+Network létrehozása:
+docker network create taxi_net
+
+Szerver image építése:
+docker image build ./server -t taxi-app
+
+
+Szerver konténer indítása:
+docker container run \
+-p 8080:3000 \
+-v $PWD/src:/server/src \
+-e DB_CONNECTION="mongodb://admin:password@taxi_database:27017" \
+--name taxi_server \
+--network taxi_net \
+taxi-app
+
+
+
+Adatbázis image építése:
+docker image build ./db -t taxi-db
+
+
+Adatbázis konténer indítása:
+docker container run \
+-v $PWD/backup:/data/db \
+-e MONGO_INITDB_ROOT_USERNAME="admin" \
+-e MONGO_INITDB_ROOT_PASSWORD="password" \
+--name taxi_database \
+--network taxi_net \
+taxi-db
